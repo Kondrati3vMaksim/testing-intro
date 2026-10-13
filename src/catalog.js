@@ -22,7 +22,13 @@ function getProductById(products, id) {
   return products.find((product) => product.id === id) || null;
 }
 
-const catalogApi = { filterByCategory, searchProducts, sortProductsByPrice, getAvailableProducts, getProductById };
+const catalogApi = {
+  filterByCategory,
+  searchProducts,
+  sortProductsByPrice,
+  getAvailableProducts,
+  getProductById,
+};
 
 if (typeof module !== 'undefined') module.exports = catalogApi;
 if (typeof window !== 'undefined') window.catalogApi = catalogApi;
