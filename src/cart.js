@@ -1,17 +1,13 @@
-function notImplemented() {
-  throw new Error('Корзина ещё не реализована. Сначала прочитайте тесты.');
-}
-
 function addToCart(basket, item, quantity) {
   const itemInBasket = basket.find((product) => product.id === item.id);
-  if (item.stock < quantity) {
-    throw new RangeError('Отствутствует количество торваров на складе');
-  }
-
+  const currentQuantity = itemInBasket ? itemInBasket.quantity : 0;
   if (quantity <= 0) {
     throw new RangeError('Количество должно быть больше нуля');
   }
 
+  if (currentQuantity + quantity > item.stock) {
+    throw new RangeError('Отствутствует количество торваров на складе');
+  }
   if (!itemInBasket) {
     return [...basket, { ...item, quantity }];
   } else {
@@ -24,8 +20,6 @@ function addToCart(basket, item, quantity) {
     });
   }
 }
-const headphones = { id: 1, name: 'Наушники', price: 49900, stock: 8 };
-const cart = [{ ...headphones, quantity: 1 }];
 
 function changeQuantity(item, id, newQuantity) {
   if (newQuantity <= 0) {
@@ -41,17 +35,24 @@ function changeQuantity(item, id, newQuantity) {
       return product;
     }
   });
-
   return newQuant;
 }
-function removeFromCart() {
-  return notImplemented();
+function removeFromCart(cart, id) {
+  return cart.filter((product) => product.id !== id);
 }
-function calculateCartSubtotal() {
-  return notImplemented();
+function calculateCartSubtotal(basket) {
+  return basket.reduce((sum, item) => sum + item.quantity * item.price, 0);
 }
-function calculateOrderTotal() {
-  return notImplemented();
+function calculateOrderTotal(basket, promo) {
+  const subTotal = calculateCartSubtotal(basket);
+  const delivery = subTotal < 50000 ? 30000 : 0;
+  const discount = subTotal >= 20000 && promo === 'SAVE10' ? subTotal * 0.1 : 0;
+  return {
+    subtotal: subTotal,
+    discount: discount,
+    delivery: delivery,
+    total: subTotal + delivery - discount,
+  };
 }
 
 const cartApi = {
@@ -64,9 +65,3 @@ const cartApi = {
 
 if (typeof module !== 'undefined') module.exports = cartApi;
 if (typeof window !== 'undefined') window.cartApi = cartApi;
-
-const basket = [{ ...headphones, quantity: 1 }];
-const result = addToCart(basket, headphones, 2);
-console.log(changeQuantity(cart, 1, 3));
-console.log('Корзина до:', basket);
-console.log('Результат:', result);
